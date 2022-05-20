@@ -1,0 +1,53 @@
+## 1. Two Phase Commit
+The 2 phases are 1) Prepare. 2) Commit.
+|pro|con|
+|--|--|
+|strong consistency||
+||requires a lock|
+||requires timeout to release, which may lock for a long time|
+||latency due to locking|
+||requires coordinator. single point of failure|
+
+Example:
+
+|coordinator|customer wallet|order|
+|-|-|-|
+|create transaction id|||
+|prepare wallet|---->||
+|prepare order||--->|
+|ok prep|<----||
+|ok prep||<----|
+|commit wallet|--->||
+|commit order||---->|
+|ok commit| <---||
+|ok commit||<----|
+
+
+
+
+## 2. Three phase commit
+3 steps are. 1) Prep 2) Pre commit 3) Commit
+
+|coordinator|participators|
+|----|----|
+|can commit|---->|
+|yes|<----|
+|precommit|<-----|
+|ack|<----|
+|commit|----->|
+|commited|<---|
+
+
+
+
+
+## 3. Saga
+
+
+
+
+## 4. 
+
+
+
+## 4

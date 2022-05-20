@@ -1,0 +1,77 @@
+# 1. isolation violation (read phenomena)
+## 1.1 Dirty read
+
+Item is read before it is commited.
+This is back because other transaction might rollback
+|T1    |  T2  |
+|------|------|
+|Wr(A) |      |
+|      | R(A) |
+|commit|      |
+
+## 1.2 Non-repeatable read
+Repeated read giving different value than initial read
+|T1    |  T2  |
+|------|------|
+|R(A)  |      |
+|      | W(A) |
+|R(A)  |      |
+
+## 1.3 Phantom read
+T1 selects a range and while T2 insert or delete rows
+T1 select same range query and result in extra row.
+
+*this differs from non-repeatable read because the overlapping rows between read1 and read2 are the same*
+|T1               |  T2                |
+|-----------------|--------------------|
+|Q(select range)  |                    |
+|                 | Update(into range) |   
+|Q(select range)  |                    |     
+
+## 1.4 Serialization anomaly
+The result of a group of concurrent committed transaciton is *impossible* to achieve if we try to run them sequentially in any order without overlapping each other. example 2 orders... A B or B A would yield that result.
+
+(preventable if serializable isolation is used)/
+
+# 2. isolation levels (defined by ANSI)
+
+## 2.1 Read uncommited
+Can see data written by uncommited transactions
+
+## 2.2 Read commited
+Can only see data written by commited transactions. 
+
+*As soon as other transactions commit, the value can be read even if the current transaction is still going.*
+
+## 2.3 Repeatable read
+Same read query always returns same result.
+]
+*even if other changes commited, current transaction will always read same before*
+
+## 2.4 Serializable
+Can achieve same result if execute transactions serially in some order instead of concurrently. (Basically, there exists at least one way to order these concurrent transactions so if we run them 1 by 1 the final result is the same).
+
+example in *MySql*:
+
+Achievable by locking rows.
+
+MySql implicitly converts all plain select query to select for share. only allow other transactions to read the rows, but not update or delete them. There is a timeout.
+
+My sql can deadlock.
+
+example in *postgres*:
+uses *dependency checking* mechanism. it might fail to let conflicting transaction to execute and user has to retry.
+
+# 3. Isolation level implementation
+dbs implement isolation levels differently. go read documentation
+
+example:
+
+mysql isolation levels: 
+|Isolation| Dirty Read|Non-repeatable read|phantom|serialization anomaly
+|---------|-----------|-------------------|-------|---|
+|read uncommited|allow|allow|allow|allow|
+|read commited|not allowed|allow|allow|allow|
+|repeatable read|not allowed|not allowed|not allowed|not allowed
+|serializable|not allowed|not allowed| not allowed|not allowed
+
