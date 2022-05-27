@@ -432,6 +432,7 @@ A multihomed host with two interfaces has thus two IPv4 addresses.
 
 #### 2.3.6.3 Address Assignment
 * not enough IPv4 addresses to go around for everyone, and routers can't be tracking where all routes go
+* Combination of networkid and hostid form the 32bit ip adddress.
 ##### 2.3.6.3.1 Subnet
 * routers should only maintain routes towards blocks of addresses and not towards individual hosts
 * IPS assign blocks of assigned address space in heirarchical manner. 
@@ -439,7 +440,7 @@ A multihomed host with two interfaces has thus two IPv4 addresses.
   * Composed of several lans linked by routers
 * Address classes
   * When a router needs to forward a packet, it must know the subnet of the destination address to be able to consult its routing table to forward the packet
-  * Use high-order bits of the address to encode the length of the subnet identifier. This led to the definition of three classes of addresses.
+  * Use high-order bits of the address to encode the length of the subnet identifier. This led to the definition of three classes of addresses (widely used). Other 2 are used for multicast, and testing.
 
 |Class|Higher-order-bits|Length of subnet id|number of networks|Address per network|
 |-|-|-|-|-|
@@ -447,11 +448,11 @@ A multihomed host with two interfaces has thus two IPv4 addresses.
 |Class B|10|16 bits|2^14 = 16,384| 2^16 = 65536|
 |Class C|110|24 bits|2^21|2^8 = 256|
 
-Class A: 0.0.0.0 to 127.255.255.255
+Class A: *0*.0.0.0 to *127*.255.255.255
 
-Class B: 128.0.0.0 to 191.255.255.255
+Class B: *128*.0.0.0 to *191*.255.255.255
 
-Class C: 192.0.0.0 to 223.255.255.255
+Class C: *192*.0.0.0 to *223*.255.255.255
 
 Class D 224.0.0.0 to 239.255.255.255
 
@@ -459,3 +460,28 @@ Class E 240.0.0.0 255.255.255.255
 
   * Class D IP addresses are used for multicast, whereas class E IP addresses are reserved and can’t be used on the Internet. So classes A, B, and C are the ones used for regular purposes.
 
+* subnet mask -> fixed number of bits in the network part to identify the network itself. The subnet mask ‘masks’ the network part of the IP address and leaves the host part Class	Default Subnet Mask
+  
+|class|subnet mask|
+|-|-|
+|Class A	|255.0.0.0|
+|Class B |255.255.0.0|
+|Class C	|255.255.255.0|
+
+* network address
+The address with all host id part set to 0. eg. 128.128.128.0
+
+* broadcast address
+all host bit set to 1. Eg. 128.128..128.255
+
+* Variable Length subnets
+the subnet identifier can be any size, from 1 to 31 bits. Variable-length subnets allow the network operators to use a subnet that better matches the number of expected hosts that will use the subnet.
+
+represented as A.B.C.D/x  x => length of subnet identifier in bits.
+
+#### 2.3.6.4 CIDR (Classless interdomain routing)
+* IP address classes are deprecated. all equipment must use variable length subnets
+* CIDR introduces a hierarchical address allocation scheme instead of first come first server
+* IP routers must use longest-prefix match when they look up a destination address in their forwarding table.
+* Allocated by Registered IP Registries which allocates smaller address blocks to ISPs. ISPs allocates smaller address blocks to customers.
+* allows routers to maintain fewer routes with heirarchical address block.
